@@ -33,12 +33,16 @@ task runAppAgain(type: JavaExec) {
   main = 'Multiply'
 
   // only works if two arguments are provided
-  // Try: using default values in case non or only one parameter is provided
-  if (project.hasProperty("num1") && project.hasProperty("num2")) {
-    args(project.getProperty('num1'), project.getProperty('num2'));
-  } else if (project.hasProperty("num1")){
-    args(project.getProperty('num1'), 1);
+  // Try: using default values in case none or only one parameter is provided
+  String num1 = "9";
+  String num2 = "5";
+  if (project.hasProperty("num1")) {
+    num1 = project.getProperty('num1');
   }
+  if (project.hasProperty("num2")){
+    num2 = project.getProperty('num2');
+  }
+  args(num1, num2);
 }
 
 // task that runs the Fraction Main which does not use arguments: gradle runFraction
@@ -56,12 +60,34 @@ task runFraction(type: JavaExec) {
 // 2. Create a new gradle tasks that accepts two arguments and 
 //    can be called as: gradle runFrac -Pdenom=4 -Pnum=3 or as gradle runFrac -Pnum=3 -Pdenom=4 , also make sure it can run with only 1 or no arguments
 
+task runFrac(type: JavaExec) {
+  group 'Fraction Tasks'
+  description 'Tasks which runs Fraction with no arguments'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'Fraction'
+
+  String denom = "3";
+  String num = "0";
+
+  if (project.hasProperty("denom")) {
+    denom = project.getProperty('denom');
+  }
+  if (project.hasProperty("num")){
+    num = project.getProperty('num');
+  }
+  args(denom, num);
+}
+
+
+
 // Example how you can add that libraries can be pulled from mavenCentral()
-// repositories {
-//   mavenCentral()
-// }
+  repositories {
+   mavenCentral()
+  }
 
 // Setting dependencies, e.g. when you import JSON in your Java files
-// dependencies{
-//   implementation 'org.json:json:20171018'
-// }
+  dependencies{
+     implementation 'org.json:json:20171018'
+ }
