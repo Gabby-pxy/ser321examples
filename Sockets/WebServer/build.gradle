@@ -23,5 +23,11 @@ task FunWebServer(type: JavaExec) {
   main = 'funHttpServer.WebServer'
   standardInput = System.in
 }
+repositories {
+  mavenCentral()
+}
 
-
+// Setting dependencies, e.g. when you import JSON in your Java files
+dependencies{
+  implementation 'org.json:json:20171018'
+}

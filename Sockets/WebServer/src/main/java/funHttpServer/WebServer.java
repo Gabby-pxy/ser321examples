@@ -17,6 +17,7 @@ write a response back
 package funHttpServer;
 
 import java.io.*;
+import org.json.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -234,17 +235,145 @@ class WebServer {
 
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
+          String string_query = (query_pairs.get("query"));
+
+          try{
+          String json = fetchURL("https://api.github.com/" + string_query);
+/*
+          Gson MY_JSON_THINGY = new GsonBuilder().setPrettyPrinting().create();
+          JsonElement parsed_result = MY_JSON_THINGY.fromJson(json, JsonElement.class);
+
+          System.out.println(parsed_result.toString());
+
+          String str = parsed_result.get("name").toString();
+**/
+
+          JSONObject jsnObj = new JSONObject();
+          JSONObject jsnObj1 = new JSONObject();
+          //
+          JSONArray repoArray = new JSONArray(json);
+          JSONArray ownerArray;
+
+          int finalObj = 0;
+          String finalObj1 = "";
+          String finalObj2 = "";
+          String str = "";
+          String str2 = "";
+          String str3 = "";
+
+          for(int i =0; i< repoArray.length(); i++) {
+              jsnObj = (JSONObject)repoArray.get(i);
+              finalObj = jsnObj.getInt("id");
+              str += (i+1) + ". " + finalObj + "\n | ";
+          }
+
+          for(int i =0; i< repoArray.length(); i++) {
+            jsnObj = (JSONObject)repoArray.get(i);
+            finalObj1 = jsnObj.getString("name");
+            str2 += (i+1) + ". " + finalObj1 + "\n | ";
+          }
+
+
+          for(int i =0; i< repoArray.length(); i++) {
+            jsnObj = (JSONObject)repoArray.get(i);
+            jsnObj1 = jsnObj.getJSONObject("owner");
+            finalObj2 = jsnObj1.getString("login");
+            str3 += (i+1) + ". " + finalObj2 + "\n | ";
+          }
+
 
           builder.append("HTTP/1.1 200 OK\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("Check the todos mentioned in the Java source file");
+          builder.append("id: {" + str + "}");
+          builder.append("\n");
+          builder.append("name: {" + str2 + "}");
+          builder.append("login: {" + str3 + "}");
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
 
-        } else {
+        } catch (Exception e){
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("This is all you get! ");
+          }
+        }
+        else if (request.contains("animal?")) {
+
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          // extract path parameters
+          query_pairs = splitQuery(request.replace("animal?", ""));
+
+          try {
+            // extract required fields from parameters
+            Integer number = Integer.parseInt(query_pairs.get("number"));
+            String animal_str = (query_pairs.get("type"));
+            String totalStr = "";
+
+            if (animal_str.equals("cow")) {
+              for (int i = 0; i < number; i++) {
+                totalStr += ("moo"+ ",\n");
+              }
+            }
+             else if (animal_str.equals("dog")) {
+                for (int i = 0; i < number; i++) {
+                  totalStr += ("bork"+ ", \n");
+                }
+              }
+            else if (animal_str.equals("cat")) {
+                  for (int i = 0; i < number; i++) {
+                    totalStr += ("meow"+ ", \n");
+                  }
+                }
+            else
+            {
+              totalStr = "That animal is not on the list try again silly (type = cat, cow, or dog)";
+            }
+
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append(totalStr);
+
+          } catch (Exception e) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Type ur numbers and animals correct, is it hard? ");
+          }
+        }
+        else if (request.contains("backwards?")) {
+
+          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+          // extract path parameters
+          query_pairs = splitQuery(request.replace("backwards?", ""));
+
+          try {
+            String word_str = (query_pairs.get("word"));
+            char ch;
+            String nstr = "";
+
+            for (int i = 0; i < word_str.length(); i++) {
+              ch = word_str.charAt(i); //extracts each character
+              nstr = ch + nstr; //adds each character in front of the existing string
+            }
+
+
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Original word \n " + word_str + "\n and reversed word \n" + nstr);
+
+          }
+          catch (Exception e) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("No reverse for u...");
+          }
+        }
+          else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
