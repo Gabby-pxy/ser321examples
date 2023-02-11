@@ -198,11 +198,10 @@ class WebServer {
           // This multiplies two numbers, there is NO error handling, so when
           // wrong data is given this just crashes
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("multiply?", ""));
-
             try{
+              Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+              // extract path parameters
+              query_pairs = splitQuery(request.replace("multiply?", ""));
             // extract required fields from parameters
             Integer num1 = Integer.parseInt(query_pairs.get("num1"));
             Integer num2 = Integer.parseInt(query_pairs.get("num2"));
@@ -216,8 +215,15 @@ class WebServer {
               builder.append("\n");
               builder.append("Result is: " + result);
             }
+            catch(StringIndexOutOfBoundsException e)
+            {
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Error in input statement...");
+            }
 
-          catch(NumberFormatException e) {
+            catch(NumberFormatException e) {
               builder.append("HTTP/1.1 400 Bad Request\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
@@ -233,11 +239,11 @@ class WebServer {
           // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
           //     "/repos/OWNERNAME/REPONAME/contributors"
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          query_pairs = splitQuery(request.replace("github?", ""));
-          String string_query = (query_pairs.get("query"));
-
           try{
+
+            Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+            query_pairs = splitQuery(request.replace("github?", ""));
+            String string_query = (query_pairs.get("query"));
           String json = fetchURL("https://api.github.com/" + string_query);
 /*
           Gson MY_JSON_THINGY = new GsonBuilder().setPrettyPrinting().create();
@@ -292,7 +298,16 @@ class WebServer {
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
 
-        } catch (Exception e){
+        }
+          catch(StringIndexOutOfBoundsException e)
+          {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error in input statement...");
+          }
+
+          catch (Exception e){
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
@@ -301,11 +316,10 @@ class WebServer {
         }
         else if (request.contains("animal?")) {
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("animal?", ""));
-
           try {
+            Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+            // extract path parameters
+            query_pairs = splitQuery(request.replace("animal?", ""));
             // extract required fields from parameters
             Integer number = Integer.parseInt(query_pairs.get("number"));
             String animal_str = (query_pairs.get("type"));
@@ -336,20 +350,26 @@ class WebServer {
             builder.append("\n");
             builder.append(totalStr);
 
-          } catch (Exception e) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Type ur numbers and animals correct, is it hard? ");
-          }
+            }catch(StringIndexOutOfBoundsException e)
+            {
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Error in input statement...");
+            }
+            catch (Exception e) {
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Type ur numbers and animals correct, is it hard? ");
+            }
         }
         else if (request.contains("backwards?")) {
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("backwards?", ""));
-
           try {
+            Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+            // extract path parameters
+            query_pairs = splitQuery(request.replace("backwards?", ""));
             String word_str = (query_pairs.get("word"));
             char ch;
             String nstr = "";
@@ -365,6 +385,13 @@ class WebServer {
             builder.append("\n");
             builder.append("Original word \n " + word_str + "\n and reversed word \n" + nstr);
 
+          }
+          catch(StringIndexOutOfBoundsException e)
+          {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error in input statement...");
           }
           catch (Exception e) {
             builder.append("HTTP/1.1 400 Bad Request\n");
